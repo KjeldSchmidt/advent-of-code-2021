@@ -5,8 +5,7 @@ lib/
 share/
 .DS_Store
 
-*-input.txt
-*-input-small.txt
+*-input*.txt
 
 advent-of-code.iml
 pyvenv.cfg
