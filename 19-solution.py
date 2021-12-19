@@ -1,9 +1,8 @@
 from collections import defaultdict
-from typing import Tuple
 
 scanners = []
 
-with open("19-input-small.txt", "r") as f:
+with open("19-input.txt", "r") as f:
     beacons = []
     for line in f.readlines():
         line = line.strip()
@@ -62,6 +61,11 @@ known_offsets = {
     scanners.index(known_scanners[0]): (0, 0, 0)
 }
 
+known_scanner_index = {
+    0: 0
+}
+
+
 def find_offset(unknown_scanner, known_scanner):
     possible_orientations = generate_rotations(unknown_scanner)
     for orientation in possible_orientations:
@@ -73,32 +77,46 @@ def find_offset(unknown_scanner, known_scanner):
 
         for offset, count in offsets.items():
             if count >= 12:
-                return offset
-
-    return None
-
-
-def find_first_match(known_scanner, unknown_scanners):
-    for unknown_scanner in unknown_scanners:
-        offset = find_offset(unknown_scanner, known_scanner)
-        if offset is not None:
-            return offset, unknown_scanner
+                return offset, orientation
 
     return None, None
 
 
+def find_first_match(known_scanner, unknown_scanners):
+    for unknown_scanner in unknown_scanners:
+        offset, correct_orientation = find_offset(unknown_scanner, known_scanner)
+        if offset is not None:
+            return offset, unknown_scanner, correct_orientation
+
+    return None, None, None
+
+
 while len(unknown_scanners) != 0:
-    for known_scanner in known_scanners:
-        offset, previously_unknown = find_first_match(known_scanner, unknown_scanners)
+    for known_index, known_scanner in enumerate(known_scanners):
+        offset, previously_unknown, correct_orientation = find_first_match(known_scanner, unknown_scanners)
         if previously_unknown is not None:
-            known_scanners.append(previously_unknown)
+            known_scanners.append(correct_orientation)
             unknown_scanners.remove(previously_unknown)
-            base_offset = known_offsets[scanners.index(known_scanner)]
-            known_offsets[scanners.index(previously_unknown)] = (
-                offset[0] - base_offset[0],
-                offset[1] - base_offset[1],
-                offset[2] - base_offset[2]
+            base_offset = known_offsets[known_scanner_index[known_index]]
+            base_scanner_index = scanners.index(previously_unknown)
+            known_scanner_index[len(known_scanners) - 1] = base_scanner_index
+            known_offsets[base_scanner_index] = (
+                (base_offset[0] - offset[0]),
+                (base_offset[1] - offset[1]),
+                (base_offset[2] - offset[2])
             )
             break
+
+known_offsets = { key: (-p[0], -p[1], -p[2]) for key, p in known_offsets.items()}
+
+absolute_beacons = set()
+for i, scanner in enumerate(known_scanners):
+    off_x, off_y, off_z = known_offsets[known_scanner_index[i]]
+    for x, y, z in scanner:
+        absolute_point = x + off_x, y + off_y, z + off_z
+        absolute_beacons.add(absolute_point)
+
+print("Solution part 1:")
+print()
 
 print(known_offsets)
