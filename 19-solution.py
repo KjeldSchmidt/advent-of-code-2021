@@ -117,6 +117,8 @@ for i, scanner in enumerate(known_scanners):
         absolute_beacons.add(absolute_point)
 
 print("Solution part 1:")
-print()
+print(len(absolute_beacons))
 
-print(known_offsets)
+offsets = list(known_offsets.values())
+print("Solution part 2:")
+print(max([abs(a[0] - b[0]) + abs(a[1] - b[1]) + abs(a[2] - b[2]) for a in offsets for b in offsets]))
