@@ -11,7 +11,7 @@ with open("20-input.txt", "r") as f:
         image_data.append([0 if char == "." else 1 for char in line.strip()])
 
     image_data = np.array(image_data)
-    image_data = np.pad(image_data, ((10, 10), (10, 10)))
+    image_data = np.pad(image_data, ((60, 60), (60, 60)))
 
 
 def area_to_dec(array):
@@ -42,9 +42,11 @@ def show_image(array):
         print()
 
 
-image_data = transform(image_data, rules, 0)
-image_data = transform(image_data, rules, 1)
+for i in range(50):
+    image_data = transform(image_data, rules, i)
+    if i == 1:
+        print("Solution part 1:")
+        print(np.sum(image_data))
 
-print("Solution part 1:")
+print("Solution part 2:")
 print(np.sum(image_data))
-
